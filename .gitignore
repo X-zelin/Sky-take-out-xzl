@@ -1,0 +1,20 @@
+**/target/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
+# 忽略 application.yml 和 application-dev.yml
+sky-server/src/main/resources/application.yml
+sky-server/src/main/resources/application-dev.ym
+sky-server/src/main/resources/application-local.yml
+# 忽略所有环境的配置文件（按需保留公共配置）
+# 例如：保留 application.yml（不含敏感信息的公共配置），忽略带环境的配置（如 dev/test/local）
+src/main/resources/application-dev.yml
+src/main/resources/application-test.yml
+src/main/resources/application-local.yml
+src/main/resources/application.yml
+
+# 忽略个人本地配置文件（通常用于存放敏感信息）
+src/main/resources/application-personal.yml
+
