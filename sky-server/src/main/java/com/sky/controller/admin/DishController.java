@@ -10,9 +10,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 菜品管理
@@ -24,6 +26,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 新增菜品
      * @param dishDTO
@@ -33,6 +37,9 @@ public class DishController {
     @ApiOperation("新增菜品")
     public Result save(@RequestBody DishDTO dishDTO){
         dishService.saveWithFlavor(dishDTO);
+        //清理缓存数据
+        String key = "dish_" + dishDTO.getCategoryId();
+        redisTemplate.delete(key);
         return Result.success();
     }
     /**
@@ -57,10 +64,12 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除菜品：{}", ids);
         dishService.deleteBatch(ids);
+        //清理缓存数据
+        Set keys= redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return Result.success();
     }
     @GetMapping("/{id}")
-    //TODO 分析为什么用DishVO
     public Result<DishVO> getById(@PathVariable Long id){
         log.info("根据id查询菜品:{}",id);
         DishVO dishVO = dishService.getByIdWithFlavor(id);
@@ -71,6 +80,13 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO){
         log.info("修改菜品：{}", dishDTO);
         dishService.updateWithFlavor(dishDTO);
+        //清理缓存数据
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return Result.success();
+    }
+    private void cleanCache(String patten){
+        Set keys = redisTemplate.keys(patten);
+        redisTemplate.delete(keys);
     }
 }

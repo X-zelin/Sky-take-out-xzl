@@ -7,4 +7,8 @@
                 values
                     (#{openid},#{name},#{phone},#{sex},#{idNumber},#{avatar},#{createTime})
     </insert>
+    <select id="getById" parameterType="java.lang.Long" resultType="com.sky.entity.User">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
 </mapper>
